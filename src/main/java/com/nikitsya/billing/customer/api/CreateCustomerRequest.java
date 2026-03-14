@@ -1,4 +1,4 @@
-package com.nikitsya.billing.customer;
+package com.nikitsya.billing.customer.api;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
