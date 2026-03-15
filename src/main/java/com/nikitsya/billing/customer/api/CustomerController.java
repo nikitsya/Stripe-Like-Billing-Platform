@@ -5,12 +5,7 @@ import com.nikitsya.billing.customer.repository.CustomerRepository;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +13,7 @@ import java.util.Locale;
 import java.util.Optional;
 
 @RestController
+@RequestMapping(path = "api/v1/customers")
 public class CustomerController {
 
     private final CustomerRepository customerRepository;
@@ -26,7 +22,7 @@ public class CustomerController {
         this.customerRepository = customerRepository;
     }
 
-    @PostMapping("/v1/customers")
+    @PostMapping
     public ResponseEntity<CustomerResponse> createCustomer(@Valid @RequestBody CreateCustomerRequest request) {
         String email = request.email().trim().toLowerCase(Locale.ROOT);
         if (customerRepository.existsByEmail(email)) {
@@ -39,7 +35,7 @@ public class CustomerController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @GetMapping("/v1/customers/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<CustomerResponse> getCustomer(@PathVariable Long id) {
         Optional<Customer> customer = customerRepository.findById(id);
         if (customer.isPresent()) {
@@ -49,7 +45,7 @@ public class CustomerController {
         return ResponseEntity.notFound().build();
     }
 
-    @GetMapping("/v1/customers")
+    @GetMapping
     public ResponseEntity<List<CustomerResponse>> getAllCustomers() {
         List<Customer> customers = customerRepository.findAll();
         List<CustomerResponse> response = new ArrayList<>();
@@ -59,7 +55,7 @@ public class CustomerController {
         return ResponseEntity.ok().body(response);
     }
 
-    @DeleteMapping("/v1/customers/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCustomer(@PathVariable Long id) {
         Optional<Customer> customer = customerRepository.findById(id);
         if (customer.isEmpty()) return ResponseEntity.notFound().build();
