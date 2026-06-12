@@ -1,6 +1,6 @@
 package com.nikitsya.billing.price.api;
 
-import com.nikitsya.billing.customer.model.Customer;
+import com.nikitsya.billing.price.model.Price;
 import com.nikitsya.billing.price.repository.PriceRepository;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,7 +19,7 @@ public class PriceController {
     }
 
     @GetMapping
-    public List<Customer> getAllPrices() {
-        return priceRepository.findAll();
+    public List<Price> getAllPrices() {
+        return priceRepository.getAllPrices();
     }
 }
