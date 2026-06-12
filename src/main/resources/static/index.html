@@ -31,63 +31,59 @@
 <body>
 <h1>Create customer</h1>
 
+<form id="ping">
+    <button type="submit">Ping</button>
+    <div id="ping_result"></div>
+</form>
+
 <form id="customerForm">
     <label for="name"></label><input id="name" name="name" placeholder="Name" required/>
     <label for="email"></label><input id="email" name="email" placeholder="Email" required type="email"/>
     <button type="submit">Create</button>
+
+    <div id="result"></div>
 </form>
 
-<div id="result"></div>
-
 <script>
-    const form = document.getElementById("customerForm");
+    const customer_form = document.getElementById("customerForm");
+    const ping_form = document.getElementById("ping");
     const result = document.getElementById("result");
-    const customerEndpoint = "api/v1/customers";
 
-    function buildCandidateUrls() {
-      const contextAwareUrl = new URL(customerEndpoint, window.location.href).toString();
-      const rootUrl = `${window.location.origin}/api/v1/customers`;
-      const localhostUrl = "http://localhost:8080/api/v1/customers";
-      const urls = [contextAwareUrl];
-
-      if (rootUrl !== contextAwareUrl) {
-        urls.push(rootUrl);
-      }
-      if (window.location.origin !== "http://localhost:8080") {
-        urls.push(localhostUrl);
-      }
-
-      return urls;
-    }
+    const customerEndpoint = "http://localhost:8080/api/v1/customers";
+    const pingEndpoint = "http://localhost:8080/api/v1/ping";
 
     async function createCustomer(payload) {
-      const candidateUrls = buildCandidateUrls();
-      let lastResult = null;
-
-      for (const url of candidateUrls) {
-        try {
-          const response = await fetch(url, {
+        const response = await fetch(customerEndpoint, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+                "Content-Type": "application/json"
+            },
             body: JSON.stringify(payload)
-          });
+        });
 
-          const body = await response.text();
-          if (response.status === 404 && url !== candidateUrls[candidateUrls.length - 1]) {
-            lastResult = { status: response.status, body, url };
-            continue;
-          }
+        const body = await response.text();
 
-          return { status: response.status, body, url };
-        } catch (error) {
-          lastResult = { error, url };
-        }
-      }
-
-      return lastResult;
+        return {
+            url: response.url,
+            status: response.status,
+            body: body,
+            error: !response.ok
+        };
     }
 
-    form.addEventListener("submit", async (e) => {
+    async function ping() {
+        const response = await fetch(pingEndpoint);
+        const body = await response.text();
+
+        return {
+            url: response.url,
+            status: response.status,
+            body: body,
+            error: !response.ok
+        };
+    }
+
+    customer_form.addEventListener("submit", async (e) => {
       e.preventDefault();
 
       const payload = {
@@ -105,7 +101,23 @@
       } catch (err) {
         result.textContent = `Request failed: ${err}`;
       }
-    });
+    })
+
+    ping_form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        try {
+            const response = await ping();
+            if (response.error) {
+                result.textContent = `Request failed via ${response.url}: ${response.error}`;
+                return;
+            }
+            result.textContent = `URL: ${response.url}\nStatus: ${response.status}\nBody: ${response.body}`;
+        } catch (err) {
+            result.textContent = `Request failed: ${err}`;
+        }
+    })
+
 </script>
 </body>
 </html>
