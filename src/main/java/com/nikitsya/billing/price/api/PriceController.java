@@ -20,6 +20,6 @@ public class PriceController {
 
     @GetMapping
     public List<Price> getAllPrices() {
-        return priceRepository.getAllPrices();
+        return priceRepository.findAll();
     }
 }
