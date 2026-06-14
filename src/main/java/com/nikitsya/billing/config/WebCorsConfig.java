@@ -13,6 +13,7 @@ public class WebCorsConfig implements WebMvcConfigurer {
                 .allowedOrigins(
                         "http://localhost:5173",
                         "http://localhost:63343",
+                        "http://localhost:63342",
                         "https://billing.nikitsya.dev"
                 )
                 .allowedMethods("GET", "POST", "DELETE", "OPTIONS")
